@@ -491,7 +491,10 @@ pub async fn nfsproc3_fsinfo(
     let res = FSINFO3resok {
         obj_attributes: dir_attr,
         rtmax: 1024 * 1024,
-        rtpref: 1024 * 124,
+        // The macOS client sizes its READs by rtpref (rounded down to 16 KiB), not by the
+        // rsize mount option: 124 KiB gave 112 KiB READs, which caps throughput at
+        // (requests in flight x 112 KiB) per round trip. With 1 MiB, rsize decides.
+        rtpref: 1024 * 1024,
         rtmult: 1024 * 1024,
         wtmax: 1024 * 1024,
         wtpref: 1024 * 1024,
